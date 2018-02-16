@@ -1,0 +1,19 @@
+{
+  "name": "dbe_front",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npm run build_ts && npm run build_scss",
+    "build_ts": "tsc",
+    "build_scss": "node_modules/.bin/node-sass --include-path src/main/scss src/main/scss/main.scss build/style.css",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "node-sass": "^4.7.2",
+    "typescript": "^2.7.2"
+  }
+}
