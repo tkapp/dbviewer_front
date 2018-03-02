@@ -1,0 +1,25 @@
+ html {
+   height: 100%;
+ }
+ body {
+   height: 100%;
+ }
+ .requid {
+   width: 100%;
+   height: 100%;
+ }
+ #treeview_pane {
+   border: 1px solid black
+ }
+ #working_pane {
+   border: 1px solid black
+ }
+ #result_pane {
+   border: 1px solid black
+ }
+ #editor_pane {
+   border: 1px solid black
+ }
+ .action {
+   cursor: pointer;
+ }

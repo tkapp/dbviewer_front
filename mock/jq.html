@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>dbv</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="./style.css">
+
+  <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+  <script>
+    $(function() {
+      $.ajax({
+        url: "./context.json",
+        dataType: "json"
+      }).done(function(list) {
+        var ul = $("#context_list");
+        $.each(list, function(i, data) {
+          var li = $("<li>").attr({"data-name": data.name});
+          $("<span class=action>").text(data.name).appendTo(li).click(toggleObjects);
+          ul.append(li);
+        });
+      });
+    });
+
+    var toggleObjects = function() {
+      parent = $(this).parent();
+      if (!parent.attr("data-hasdata")) {
+        getObjects(parent);
+        parent.attr("data-hasdata", true);
+      }
+
+      parent.children("ul").toggle();
+    }
+
+    var getObjects = function(parent) {
+
+      var contextName = parent.attr("data-name");
+
+      $.ajax({
+        url: "./" + contextName + "_objects.json",
+        dataType: "json"
+      }).done(function(data) {
+
+        var contextName = data.name;
+
+        var object_ul = $("<ul>").appendTo(parent);
+        var object_li = $("<li class=table>").appendTo(object_ul);
+        $("<span class=action>").text("TABLE").click(function() { $(this).next().toggle(); }).appendTo(object_li);
+        var table_ul = $("<ul>").hide().appendTo(object_li);
+
+        $.each(data.tables, function(i, table) {
+          var li = $("<li>").attr({"data-contextname": contextName, "data-tablename": table.name}).appendTo(table_ul);
+          $("<span class=action>").text(table.name).click(toggleColumn).appendTo(li);
+        });
+
+        object_li = $("<li class=view>").appendTo(object_ul);
+        $("<span class=action>").text("VIEW").click(function() { $(this).next().toggle(); }).appendTo(object_li);
+        var view_ul = $("<ul>").hide().appendTo(object_li);
+
+        $.each(data.views, function(i, view) {
+          var li = $("<li>").attr({"data-contextname": contextName, "data-tablename": view.name}).appendTo(table_ul);
+          $("<span class=action>").text(view.name).click(toggleColumn).appendTo(li);
+        });
+      });
+    };
+
+    var toggleColumn = function() {
+      parent = $(this).parent();
+      if (!parent.attr("data-hasdata")) {
+        getColumns(parent);
+        parent.attr("data-hasdata", true);
+      }
+
+      parent.children("ul").toggle();
+    }
+
+    var getColumns = function(parent) {
+
+      var contextName = parent.attr("data-contextname");
+      var tableName = parent.attr("data-tablename");
+      var url = "./" + contextName + "_" + tableName + "_columns.json";
+      console.log(url);
+      $.ajax({
+        url: url,
+        dataType: "json"
+      }).done(function(data) {
+        var ul = $("<ul>").appendTo(parent);
+
+        $.each(data.columns, function(i, column) {
+          var li = $("<li>").text(column.name).appendTo(ul);
+        });
+      }).fail(function(data, e) {
+    	  console.log(data);
+    	  console.log(e);
+      });
+    };
+  </script>
+
+</head>
+<body>
+
+  <div class="container-fluid requid">
+    <div class="row requid">
+
+      <div id="treeview_pane" class="col-3 requid" style="overflow-y: scroll;">
+        <div id="list">
+          <h3>設定一覧</h3>（<a href="#">追加</a>）
+          <ul id="context_list"></ul>
+        </div>
+      </div>
+
+      <div id="working_pane" class="col-9">
+
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            SQL0
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-name="sql1">SQL1</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#" data-name="sql2">SQL2</a>
+          </li>
+        </ul>
+
+        <br><br>
+
+        <div id="editor_pane">
+          <div id="action_bar"><a href="#">▶</a></div>
+          <textarea name="sql" class="requid">select * from mysql.user</textarea>
+        </div>
+
+        <div id="result_pane requid">
+          result
+        </div>
+
+      </div>
+
+    </div><!-- // row -->
+  </div><!-- // container -->
+
+</body>
+</html>

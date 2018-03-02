@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>dbv</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/react-table@latest/react-table.css">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.10.3/babel.min.js"></script>
+
+  <script src="https://unpkg.com/react-table@latest/react-table.js"></script>
+  <script src="https://unpkg.com/react-table@latest/react-table.min.js"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>
+
+  <script type="text/babel">
+
+  var Contexts = React.createClass({
+
+  getInitialState() {
+    return {
+      contexts: []
+    };
+  },
+
+  componentDidMount: function() {
+    this.load();
+  },
+
+  load: function() {
+    $.get("./data/", function(json) {
+      this.setState({
+        contexts: json
+      });
+    }.bind(this));
+  },
+
+  reload: function() {
+    this.load();
+  },
+
+  render: function(e) {
+    var contexts = this.state.contexts.map(function(context) {
+      return (
+        <Context name={context} key={context} />
+      );
+    });
+    return (
+      <div>
+        <h2>設定一覧</h2>
+        <button onClick={this.reload}>再読込</button>
+        <ul>
+          { contexts }
+        </ul>
+      </div>
+    );
+  }
+});
+
+var Context = React.createClass({
+
+  getInitialState() {
+    return {
+      visible: false,
+      tableVisible: false,
+      viewVisible: false,
+      tables: [],
+      views: [],
+      loaded: false
+    };
+  },
+
+  toggle: function() {
+    this.setState({
+      visible: !this.state.visible
+    });
+  },
+
+  toggleTable: function() {
+    this.loadObjects(this.props.name);
+    this.setState({
+      tableVisible: !this.state.tableVisible
+    });
+  },
+
+  toggleView: function() {
+    this.loadObjects(this.props.name);
+    this.setState({
+      viewVisible: !this.state.viewVisible
+    });
+  },
+
+  loadObjects: function(contextName) {
+    if (!this.state.loaded) { // TODO wclick
+      var url = "./data/" + contextName + "/";
+      $.get(url, function(json) {
+        this.setState({
+          loaded: true,
+          tables: json.tables,
+          views: json.views
+        });
+      }.bind(this));
+    }
+  },
+
+  render: function(e) {
+    var tables = this.state.tables.map(function(table) {
+      return (<DatabaseObject contextName={ this.props.name } name={ table.name } key={ table.name } />)
+    }.bind(this));
+
+    var views = [];
+
+    return (
+      <li>
+        <span className="action" onClick={ this.toggle }>{ this.props.name }</span>
+        <ul className="objects" style={{ display: this.state.visible ? "": "none" }}>
+          <li>
+            <span className="action" onClick={ this.toggleTable }>TABLE</span>
+            <ul style={{ display: this.state.tableVisible ? "": "none" }}>
+              { tables }
+            </ul>
+          </li>
+          <li>
+            <span className="action" onClick={ this.toggleView }>VIEW</span>
+            <ul style={{ display: this.state.viewVisible ? "": "none" }}>
+              { views }
+            </ul>
+          </li>
+        </ul>
+      </li>
+    );
+  }
+});
+
+var DatabaseObject = React.createClass({
+
+  getInitialState() {
+    return {
+      visible: false,
+      columns: [],
+      loaded: false
+    };
+  },
+
+  toggle: function() {
+    this.load();
+    this.setState({
+      visible: !this.state.visible
+    });
+  },
+
+  load: function() {
+
+    if (!this.state.loaded) {
+      var url = "./data/" + this.props.contextName + "/" + this.props.name + "/";
+      $.get(url, function(json) {
+        this.setState({
+          columns: json,
+          loaded: true
+        });
+      }.bind(this));
+    }
+  },
+
+  render: function(e) {
+    var columns = this.state.columns.map(function(column) {
+      return (<Column contextName={ this.props.contextName } tableName={ this.props.name } name={ column.name } key={ column.name } />)
+    }.bind(this));
+
+    return (
+      <li>
+        <span className="action table" onClick={ this.toggle }>{ this.props.name }</span>
+         <ul style={{ display: (this.state.visible) ? "": "none" }}>
+           { columns }
+         </ul>
+      </li>
+    );
+  }
+});
+
+var Column = React.createClass({
+
+  render: function(e) {
+    return (
+      <li>
+        <span>{ this.props.name }</span>
+      </li>
+    );
+  }
+});
+
+
+var ReactTable = window.ReactTable.default;
+ 
+var WorkView = React.createClass({
+
+  getInitialState() {
+    return {
+      sql: "",
+      columns: [{Header: "A", accessor:"a"}, {Header: "B", accessor: "b"}, {Header: "C", accessor: "c"}],
+      data: [{a: "aaa", b: "bbb", c: "ccc"}]
+    };
+  },
+
+  handleChange(e) {
+    this.setState({ sql: e.target.value})
+  },
+
+  execute: function(e) {
+    $.ajax({
+      url: "/data/tpcc/execute",
+      type: "POST",
+      data: {
+        sql: this.state.sql
+      }
+    }).done(function(json) {
+      console.log(json); 
+    }).fail(function(json) {
+      console.log(json);
+    });
+  },
+
+  render: function(e) {
+    return (
+      <div className="requid">
+        <div className="toolbar">
+          <input type="button" value="execute" onClick={ this.execute } />
+        </div>
+        <div className="editor">
+          <textarea name="sql" className="sql" cols="150" rows="20" onChange={ this.handleChange }></textarea>
+        </div>
+        <div className="result">
+          <ReactTable
+            data={ this.state.data }
+            columns={ this.state.columns }
+          />
+        </div>
+      </div>
+    );
+  }
+});
+
+ReactDOM.render(
+  <Contexts />,
+  document.getElementById('treeview_pane')
+);
+
+ReactDOM.render(
+  <WorkView />,
+  document.getElementById('work_pane')
+);
+
+  </script>
+</head>
+<body>
+  <div class="container-fluid requid">
+    <div class="row requid">
+      <div id="treeview_pane" class="col-3 requid" style="overflow-y: scroll;"></div>
+      <div id="work_pane" class="col-9 requid"></div>
+    </div>
+  </div>
+
+</body>
+</html>
