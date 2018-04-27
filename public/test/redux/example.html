@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>title</title>
+</head>
+<body>
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.6.0/redux.min.js"></script>
+<script type="text/javascript">
+
+(() => {
+    document.body.innerHTML = `
+    <button onclick="actionSetURL(document.getElementById('url').value)">Set</button>
+    <button onclick="actionGetImg()">Get</button>
+    <button onclick="actionClear()">Clear</button>
+    <input id="url" type="text" style="width: 600px;" />
+    <div id="render"></div>
+  `;
+})();
+
+// Action
+function actionSetURL(url) {
+  return url && store.dispatch({ type: 'SET_URL', url });
+}
+function actionGetImg() {
+  store.dispatch({ type: 'GET_IMG' });
+}
+function actionClear() {
+  store.dispatch({ type: 'CLEAR' });
+}
+
+// Reducer
+function reducerURL(state = '', action) {
+  console.log("reducerURL");
+  switch (action.type) {
+    case 'SET_URL':
+      return action.url;
+    case 'CLEAR':
+      return '';
+    default:
+      return state;
+  }
+}
+function reducerImg(state = false, action) {
+  console.log("reducerImg");
+  switch (action.type) {
+    case 'GET_IMG':
+      return true;
+    case 'CLEAR':
+      return false;
+    default:
+      return state;
+  }
+}
+
+const combineReducers = reducers => (state = {}, action) => Object.keys(reducers).reduce((nextState, key) => {
+  nextState[key] = reducers[key](state[key],action);
+  return nextState;
+}, {});
+var rootReducer = combineReducers({ reducerURL, reducerImg });
+
+// Store, Provider, Render
+var store = Redux.createStore(rootReducer); // storeの作成
+function provider(state) {
+  var stateView = `
+    <div>
+      <div>state.reducerURL: ${state.reducerURL}</div>
+      <div>state.reducerImg: ${state.reducerImg}</div>
+    </div>
+  `;
+  var imgView = state.reducerImg ? `<img src='${state.reducerURL}' />` : '';
+  return `
+    <div>
+      ${stateView}
+      ${imgView}
+    </div>
+  `;
+}
+
+function render() {
+  document.getElementById('render').innerHTML = provider(store.getState());
+}
+
+store.subscribe(render);
+render();
+
+</script>
+</html>

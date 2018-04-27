@@ -16,7 +16,6 @@
   <script src="https://unpkg.com/react-table@latest/react-table.js"></script>
   <script src="https://unpkg.com/react-table@latest/react-table.min.js"></script>
 
-
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/0.3.5/marked.min.js"></script>
 
@@ -26,6 +25,8 @@
 
   <script type="text/babel">
 
+  var ReactTable = window.ReactTable.default;
+  
   var Contexts = React.createClass({
 
   getInitialState() {
@@ -47,9 +48,16 @@
   },
 
   reload: function() {
+    this.setState({
+      contexts: []
+    });
     this.load();
   },
 
+  newContext: function() {
+    location.href = "new.html";
+  },
+  
   render: function(e) {
     var contexts = this.state.contexts.map(function(context) {
       return (
@@ -60,6 +68,7 @@
       <div>
         <h2>設定一覧</h2>
         <button onClick={this.reload}>再読込</button>
+        <button onClick={this.newContext}>新規</button>
         <ul>
           { contexts }
         </ul>
@@ -119,7 +128,9 @@ var Context = React.createClass({
       return (<DatabaseObject contextName={ this.props.name } name={ table.name } key={ table.name } />)
     }.bind(this));
 
-    var views = [];
+    var views = this.state.views.map(function(view) {
+      return (<DatabaseObject contextName={ this.props.name } name={ view.name } key={ view.name } />)
+    }.bind(this));
 
     return (
       <li>
@@ -199,17 +210,14 @@ var Column = React.createClass({
     );
   }
 });
-
-
-var ReactTable = window.ReactTable.default;
  
 var WorkView = React.createClass({
 
   getInitialState() {
     return {
       sql: "",
-      columns: [{Header: "A", accessor:"a"}, {Header: "B", accessor: "b"}, {Header: "C", accessor: "c"}],
-      data: [{a: "aaa", b: "bbb", c: "ccc"}]
+      columns: [],
+      data: []
     };
   },
 
@@ -217,16 +225,47 @@ var WorkView = React.createClass({
     this.setState({ sql: e.target.value})
   },
 
+  explain: function(e) {
+    this.postSQL("explain");	
+  },
+  
   execute: function(e) {
+    this.postSQL("execute");	
+  },
+  
+  postSQL: function(method) {
+
+    if (this.state.sql === "") {
+	  alert("Please write sql.");
+	  return;
+	}
+
     $.ajax({
-      url: "/data/tpcc/execute",
+      url: "/data/tpcc/" + method,
       type: "POST",
       data: {
         sql: this.state.sql
       }
     }).done(function(json) {
-      console.log(json); 
-    }).fail(function(json) {
+
+	  if (json.header) {
+
+		var header = [];
+
+		$.each(json.header, function(i, v) {
+		  header.push({Header: v, accessor: v});
+		});
+
+		this.setState({
+		  columns: header,
+		  data: json.body
+		});
+
+	  } else {
+	    alert("no result.");
+	  }
+
+    }.bind(this)).fail(function(e, json) {
       console.log(json);
     });
   },
@@ -236,6 +275,7 @@ var WorkView = React.createClass({
       <div className="requid">
         <div className="toolbar">
           <input type="button" value="execute" onClick={ this.execute } />
+		  <input type="button" value="explain" onClick={ this.explain } />
         </div>
         <div className="editor">
           <textarea name="sql" className="sql" cols="150" rows="20" onChange={ this.handleChange }></textarea>
@@ -267,7 +307,7 @@ ReactDOM.render(
   <div class="container-fluid requid">
     <div class="row requid">
       <div id="treeview_pane" class="col-3 requid" style="overflow-y: scroll;"></div>
-      <div id="work_pane" class="col-9 requid"></div>
+      <div id="work_pane" class="col-9 requid" style="overflow-y: scroll;"></div>
     </div>
   </div>
 

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>dbv</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.10.3/babel.min.js"></script>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-redux/5.0.7/react-redux.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+  <script type="text/babel">
+    // action creator
+    var actionCreater = {
+      greet: function () {
+        return {"type": "GREET"}
+      },
+      getName: function (name) {
+        return {
+          "type": "GET_NAME",
+          "name": name
+        }
+      }
+    };
+
+    // inital state
+    var initalState = {
+      name: ""
+    };
+
+    // reducer  
+    function reducer(state = initalState, action) {
+      console.log("reducer");
+      switch (action.type) {
+        case "GREET":
+          console.log("greet");
+          return {greet: "hello"}
+        case "GET_NAME":
+          return {name: action.name}
+        default:
+          return state;
+      }
+    }
+
+    // store
+    var store = Redux.createStore(reducer);
+
+    // Provider, Render
+    var Display = React.createClass({
+      render: function(e) {
+        return(
+          <div>
+            <div>greet = { this.props.greet }</div>
+            <div>name = { this.props.name }</div>
+            <Controller />
+          </div>
+        );
+      }
+    });
+
+    var Controller = React.createClass({
+
+      greet: function() {
+        store.dispatch(actionCreater.greet());
+      },
+
+      name: function() {
+        store.dispatch(actionCreater.getName());
+      },
+
+      render: function(e) {
+        return (
+          <div>
+            <input type="button" onClick={ this.greet } value="greet" />
+            <input type="button" onClick={ this.name } value="name" />
+          </div>
+        );
+      }
+    });
+
+    // stateとpropのマッピングを行う
+    var mapStateToProps = function(state) {
+      return {
+        name: state.name,
+        greet: state.greet
+      };
+    };
+
+    var DisplayContainer = ReactRedux.connect(mapStateToProps)(Display);
+
+    var Provider = ReactRedux.Provider;
+    ReactDOM.render(
+      <Provider store={store}>
+        <DisplayContainer name="test" />
+      </Provider>,
+      document.getElementById('sample')
+    );
+
+  </script>
+
+</head>
+
+<body>
+  <div id="sample"></div>
+  <div id="controller"></div>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>dbv</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <link rel="stylesheet" href="./style.css">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react/15.3.1/react-dom.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router/4.2.0/react-router.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/4.2.2/react-router-dom.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.10.3/babel.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+  <script type="text/babel">
+
+  var Menu = React.createClass({
+    render: function(e) {
+      return(
+        <div>
+          <ReactRouter.Link to="/test/router/">/test/router/</ReactRouter.Link><br />
+          <ReactRouter.Link to="/test/router/test/">/test/router/test/</ReactRouter.Link><br />
+          <ReactRouter.Link to="/test/router/test/taro">/test/router/test/taro</ReactRouter.Link><br />
+        </div>
+      );
+    }
+  });
+
+  var Test = React.createClass({
+    render: function(e) {
+      return(
+        <h2>Test1</h2>
+      );
+    }
+  });
+
+  var Name = React.createClass({
+    render: function(e) {
+      return(
+        <h2>aa{this.props.params}</h2>
+      );
+    }
+  });
+
+  var ReactRouter = window.ReactRouterDOM;
+
+  ReactDOM.render(
+    <ReactRouter.BrowserRouter>
+      <div>
+        <ReactRouter.Route path="/test/router/" component={Menu} />
+        <ReactRouter.Route exact path="/test/router/test/" component={Test} />
+        <ReactRouter.Route exact path="/test/router/test/:name" component={Name} />
+      </div>
+    </ReactRouter.BrowserRouter>,
+    document.getElementById('sample')
+  );
+
+  </script>
+  <style>
+  .sample {
+  }
+  </style>
+</head>
+<body>
+  <div id="sample">
+  </div>
+
+</body>
+</html>

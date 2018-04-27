@@ -1,19 +1,37 @@
 {
-  "name": "dbe_front",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "build": "npm run build_ts && npm run build_scss",
-    "build_ts": "tsc",
-    "build_scss": "node_modules/.bin/node-sass --include-path src/main/scss src/main/scss/main.scss build/style.css",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "webpack",
+    "watch": "webpack -w",
+    "lint": "tslint 'src/main/ts/**/*.ts{,x}'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "devDependencies": {
+    "@types/jquery": "^3.3.1",
+    "@types/react": "^16.0.40",
+    "@types/react-dom": "^16.0.4",
+    "@types/react-redux": "^5.0.15",
+    "@types/redux": "^3.6.0",
+    "css-loader": "^0.28.10",
+    "extract-text-webpack-plugin": "^3.0.2",
     "node-sass": "^4.7.2",
-    "typescript": "^2.7.2"
-  }
+    "sass-loader": "^6.0.7",
+    "style-loader": "^0.20.3",
+    "ts-loader": "^4.0.1",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0",
+    "tslint-react": "^3.5.1",
+    "tsutils": "^2.26.1",
+    "typescript": "^2.7.2",
+    "webpack": "^4.1.1",
+    "webpack-cli": "^2.0.11"
+  },
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "react": "^16.2.0",
+    "react-dom": "^16.2.0",
+    "react-redux": "^5.0.7",
+    "react-router-dom": "^4.2.2",
+    "react-table": "^6.8.0",
+    "redux": "^3.7.2"
+  },
+  "private": true
 }

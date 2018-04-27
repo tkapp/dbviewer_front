@@ -1,0 +1,42 @@
+
+## react
+
+```
+npm -S react react-dom
+npm -D @types/react @types/react-dom
+```
+
+## jsの圧縮、1ファイル化
+
+webpackを利用し、jsファイルの圧縮、1ファイル化を行います。
+
+まずは必要なモジュールのインストール
+
+```
+npm -D webpack webpack-cli 
+```
+
+webpack.config.js作成
+
+
+## tsコンパイル
+
+```
+npm i -D typescript ts-loader
+```
+
+## scssコンパイル、1ファイル化
+
+```
+npm i -D css-loader style-loader node-sass sass-loader extract-text-webpack-plugin
+```
+
+tsconfig.jsonの作成
+
+## lint
+
+```
+npm i -D tslint tslint-config-airbnb tsutils tslint-react
+```
+
+tslint.json作成

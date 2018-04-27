@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <title>dbv</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/redux/3.7.2/redux.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
+
+  <script type="text/javascript">
+
+    var actionCreater = {
+      greet: function () {
+        return {"type": "GREET"}
+      },
+      getName: function (json) {
+        return {
+          "type": "GET_NAME",
+          "name": json.name
+        }
+      }
+    };
+
+    function greet() {
+      store.dispatch(actionCreater.greet());
+    }
+
+    function getName() {
+      console.log("getName");
+      $.get("sample.json", function(json) {
+        console.log(json);
+        store.dispatch(actionCreater.getName(json));
+      }).fail(function(jqXHR, textStatus, errorThrown) {
+        console.log(jqXHR);
+        console.log(textStatus);
+        console.log(errorThrown);
+      });
+    }
+
+    var initialState = {
+      msg: ""
+    };
+    
+    function reducer1(state = initialState, action) {
+      console.log("1");
+      switch (action.type) {
+        case "GREET":
+          return {msg: "hello"}
+        default:
+          return state;
+      }
+    }
+
+    function reducer2(state = {name: ""}, action) {
+      console.log("2");
+      switch (action.type) {
+        case "GET_NAME":
+          return {name: action.name}
+        default:
+          return state;
+      }
+    }
+
+    const combineReducers = reducers => (state = {}, action) => Object.keys(reducers).reduce(function(nextState, key) {
+      nextState[key] = reducers[key](state[key],action);
+      return nextState;
+    }, {});
+
+    var rootReducer = combineReducers({reducer1, reducer2});
+
+    var store = Redux.createStore(rootReducer);
+
+    function provider(state) {
+      var container = $("<div />");
+      $("<div />").html("msg = " + state.reducer1.msg).appendTo(container);
+      $("<div />").html("name = " + state.reducer2.name).appendTo(container);
+      return container;
+    }
+
+    function render() {
+      console.log(store);
+      var content = provider(store.getState());
+      $("#sample").html(content);
+    }
+
+    store.subscribe(render);
+    render();
+    </script>
+  <style>
+  </style>
+</head>
+<body>
+  <div id="sample"></div>
+  <input type=button onClick='greet()' value='greet' />
+  <input type=button onClick='getName()' value='getName' />
+</body>
+</html>

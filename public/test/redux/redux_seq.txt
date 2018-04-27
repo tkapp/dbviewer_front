@@ -1,0 +1,23 @@
+
+activate CustomFunction
+
+CustomFunction -> ActionCreator :
+ActionCreator --> CustomFunction : Action
+
+CustomFunction -> Store : dispatch(Action)
+
+Store -> Reducer : CurrentState, Action
+Reducer --> Store : NewState
+
+Store -> Renderer :
+
+Renderer -> State : getState
+State --> Renderer : state
+
+Renderer -> Provider : state
+Provider -> Renderer : html
+
+Rendering
+
+Renderer --> Store :
+Store --> CustomFunction :

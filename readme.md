@@ -1,9 +1,15 @@
 #
 
-## node.jsモジュールインストール
+## 環境構築
 
 ````sh:
-npm i -g typescript
-npm i -g node-sass
+npm i -g typescript node-sass webpack
 npm i
 ````
+
+
+## build
+
+```sh:
+npm run build
+```
